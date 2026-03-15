@@ -2,7 +2,7 @@ import os
 from urllib.parse import urlparse
 import instaloader
 
-DOWNLOAD_DIR = os.path.expanduser("~/storage/downloads")
+DOWNLOAD_DIR = os.path.expanduser("~/storage/dcim/Camera")
 
 L = instaloader.Instaloader(
     download_videos=True,
@@ -45,7 +45,8 @@ def download_post(url):
         media_scan(DOWNLOAD_DIR)
 
         print("✅ Tamamlandı.")
-        print("📁 Video Download klasörüne kaydedildi")
+        print(f"📁 Kayıt yeri: {DOWNLOAD_DIR}")
+        print("🖼️ Galeride Kamera/Videolar kısmını kontrol et.")
 
     except Exception as e:
         print("❌ Hata:", e)
