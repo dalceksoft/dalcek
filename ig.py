@@ -1,8 +1,10 @@
 import os
 from urllib.parse import urlparse
+from datetime import datetime
+
 import instaloader
 
-DOWNLOAD_DIR = os.path.expanduser("~/storage/dcim/Camera")
+DOWNLOAD_DIR = "/storage/emulated/0/Movies"
 
 L = instaloader.Instaloader(
     download_videos=True,
@@ -12,8 +14,9 @@ L = instaloader.Instaloader(
     compress_json=False,
     post_metadata_txt_pattern="",
     dirname_pattern=DOWNLOAD_DIR,
-    filename_pattern="{date_utc}_UTC",
+    filename_pattern="{filename}",
 )
+
 
 def extract_shortcode(url):
     parsed = urlparse(url.strip())
@@ -24,8 +27,15 @@ def extract_shortcode(url):
 
     return None
 
+
 def media_scan(path):
     os.system(f'termux-media-scan "{path}" > /dev/null 2>&1')
+
+
+def make_filename(shortcode):
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    return f"instagram_{shortcode}_{now}"
+
 
 def download_post(url):
     shortcode = extract_shortcode(url)
@@ -39,22 +49,34 @@ def download_post(url):
 
         post = instaloader.Post.from_shortcode(L.context, shortcode)
 
+        custom_name = make_filename(shortcode)
+
         print("⬇️ İndiriliyor...")
+        L.filename_pattern = custom_name
         L.download_post(post, target=".")
 
         media_scan(DOWNLOAD_DIR)
 
         print("✅ Tamamlandı.")
         print(f"📁 Kayıt yeri: {DOWNLOAD_DIR}")
-        print("🖼️ Galeride Kamera/Videolar kısmını kontrol et.")
+        print("🎬 Galeride Movies kısmını kontrol et.")
 
     except Exception as e:
         print("❌ Hata:", e)
 
-while True:
-    url = input("\nInstagram linki gir (çıkmak için q): ").strip()
 
-    if url.lower() == "q":
-        break
+def main():
+    print("Instagram Reel / Post Downloader")
 
-    download_post(url)
+    while True:
+        url = input("\nInstagram linki gir (çıkmak için q): ").strip()
+
+        if url.lower() == "q":
+            print("Çıkılıyor...")
+            break
+
+        download_post(url)
+
+
+if __name__ == "__main__":
+    main()
